@@ -93,12 +93,22 @@ class VideoSet(torch.utils.data.Dataset):
                     (self.sample_width, self.sample_height),
                     interpolation=cv2.INTER_LINEAR,
                 )
-                if frames is None:
-                    frames = in_frame[None, ...]
-                else:
-                    frames = np.concatenate((frames, in_frame[None, ...]), axis=0)
 
+                crop_wstart = int((self.sample_width - self.cfg.DATA.TEST_CROP_SIZE)/2)
+                crop_wend = crop_wstart + self.cfg.DATA.TEST_CROP_SIZE
+                crop_hstart = int((self.sample_height- self.cfg.DATA.TEST_CROP_SIZE)/2)
+                crop_hend = crop_hstart + self.cfg.DATA.TEST_CROP_SIZE
+
+                in_frame = in_frame[crop_hstart:crop_hend, crop_wstart:crop_wend]
+
+                if frames is None:
+                    frames = [in_frame, ]
+                else:
+                    frames.append(in_frame)
+
+            frames = np.array(frames)
             frames = self._pre_process_frame(frames)
+            video_clip.close()
 
             return frames
 

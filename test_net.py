@@ -61,7 +61,7 @@ def perform_inference(test_loader, model, cfg):
         if cfg.NUM_GPUS > 1:
             preds, feat = du.all_gather([preds, feat])
 
-        feat = feat.cpu().numpy()
+        feat = feat.detach().cpu().numpy()
 
         if feat_arr is None:
             feat_arr = feat
